@@ -58,7 +58,10 @@ class Game extends React.Component {
     }
 
     restartHandler() {
-
+    }
+    action (one, two) {
+        console.log(one)
+        console.log(two)
     }
 
     render() {
@@ -66,17 +69,41 @@ class Game extends React.Component {
             <div>
                 <div class='grid-container'>
                     <div class='grid-item'>
-                    <button class='grid-item' style={{fontSize:`10px`}} onClick={console.log('click')}>CLICK ME</button>
-                    {pprint(state[0][0])}
+                        <p class='text'>{pprint(state[0][0])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(0, 0)}}></button>
                     </div>
-                    <div class='grid-item'>{pprint(state[0][1])}</div>
-                    <div class='grid-item'>{pprint(state[0][2])}</div>
-                    <div class='grid-item'>{pprint(state[1][0])}</div>
-                    <div class='grid-item'>{pprint(state[1][1])}</div>
-                    <div class='grid-item'>{pprint(state[1][2])}</div>
-                    <div class='grid-item'>{pprint(state[2][0])}</div>
-                    <div class='grid-item'>{pprint(state[2][1])}</div>
-                    <div class='grid-item'>{pprint(state[2][2])}</div>
+                    <div class='grid-item'>
+                        <p class='text'>{pprint(state[0][1])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(0, 1)}}></button>
+                    </div>
+                    <div class='grid-item'>
+                        <p class='text'>{pprint(state[0][2])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(0, 2)}}></button>
+                    </div>
+                    <div class='grid-item'>
+                        <p class='text'>{pprint(state[1][0])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(1, 0)}}></button>
+                    </div>
+                    <div class='grid-item'>
+                        <p class='text'>{pprint(state[1][1])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(1, 1)}}></button>
+                    </div>
+                    <div class='grid-item'>
+                        <p class='text'>{pprint(state[1][2])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(1, 2)}}></button>
+                    </div>
+                    <div class='grid-item'>
+                        <p class='text'>{pprint(state[2][0])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(2, 0)}}></button>
+                    </div>
+                    <div class='grid-item'>
+                        <p class='text'>{pprint(state[2][1])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(1, 1)}}></button>
+                    </div>
+                    <div class='grid-item'>
+                        <p class='text'>{pprint(state[2][1])}</p>
+                        <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(2, 2)}}></button>
+                    </div>
                 </div>
                 <div class='footer'>
                     <button>RESTART</button>
@@ -86,7 +113,6 @@ class Game extends React.Component {
         )
 
     }
-
 }
 
 

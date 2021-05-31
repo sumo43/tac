@@ -22,16 +22,16 @@ const isFull = (state) => {
 }
 
 //this is fine
-const won = (state) => { 
+const utility = (state) => { 
     let i = 0;
-    let ret = -1
+    let ret = 2
 
     for(i = 0; i < 3; i++) {
         if(state[i][0] == 1 && state[i][1] == 1 && state[i][2] == 1) {
             ret = 1
         }
         else if(state[i][0] == 0 && state[i][1] == 0 && state[i][2] == 0) {
-            ret = 0
+            ret = -1
         }
     }
 
@@ -40,27 +40,27 @@ const won = (state) => {
             ret = 1
         }
         else if(state[0][i] == 0 && state[1][i] == 0 && state[2][i] == 0) {
-            ret = 0
+            ret = -1
         }
     }
 
-    if(state[0][0] == 0 && state[1][1] == 0 && state[2][2] == 0) ret = 0
+    if(state[0][0] == 0 && state[1][1] == 0 && state[2][2] == 0) ret = -1
     else if(state[0][0] == 1 && state[1][1] == 1 && state[2][2] == 1) ret = 1
 
 
-    if(state[0][2] == 0 && state[1][1] == 0 && state[2][0] == 0) ret = 0
+    if(state[0][2] == 0 && state[1][1] == 0 && state[2][0] == 0) ret = -1
     else if(state[0][2] == 1 && state[1][1] == 1 && state[2][0] == 1) ret = 1
     
     if(isFull(state)) {
-        ret = 2
+        ret = 0
     }
     
     return ret
 }
 
-const arrayMax = (array) => {
+const argMax = (array) => {
     let max = -4000
-    let maxIndex = 2
+    let maxIndex = 0
     let i
 
     for(i = 0; i < array.length; i++) {
@@ -74,9 +74,9 @@ const arrayMax = (array) => {
     return maxIndex
 }
 
-const arrayMin = (array) => {
+const argMin = (array) => {
     let min = 40000
-    let minIndex = 2
+    let minIndex = 0
     let i
 
     for(i=0; i < array.length; i++) {
@@ -101,22 +101,15 @@ const arrMap = (array, func) => {
 
 const minvalue = (state) => {
     
-    let w = won(state)
-    if(w == 0) {
-        console.log(state)
-        return 1
-    } 
-    else if(w == 1) return -1
-    else if(w == 2) {
-        return 0
-    }
-    else {
-        let neighbors = n(state, 1)
-        let neighborMaxvalue = arrMap(neighbors, maxvalue)
 
-        let min = arrayMin(neighborMaxvalue)
-        return min
+    let util = utility(state)
+    if(util != 2) {
+        return util
     }
+    let neighbors = n(state, 0)
+    let neighborMaxvalue = neighbors.map(maxvalue)
+    let min = Math.min(...neighborMaxvalue)
+    return min
     
 }
 
@@ -124,32 +117,38 @@ const minvalue = (state) => {
 
 const maxvalue = (state) => { 
 
-    let w = won(state)   
-    if(w == 0) return 1 
-    else if(w == 1) return -1
-    else if(isFull(state)) {
-        return 0
-    }
-    else
+    let util = utility(state)
+    if(util != 2)
     {
-        let neighbors = n(state, 0)
-        let neighborMinvalue = arrMap(neighbors, minvalue)
-
-        let max = arrayMax(neighborMinvalue)
-        return max
+        return util
     }
+
+    let neighbors = n(state, 1)
+    let neighborMinvalue = neighbors.map(minvalue)
+    let max = Math.max(...neighborMinvalue)
+    return max
     
 }
+
 
 //starting with computer
 const minimax = (state, i) => {
 
     if (i == 0) {
-
         //max of min values of all of the neighbors
         let neighbors = n(state, 0)
-        let maxIndex = arrayMax(arrMap(neighbors, minvalue))
+        let maxIndex = argMin(arrMap(neighbors, maxvalue))
         return neighbors[maxIndex]
+    }
+    if (i == 1) {
+        //max of min values of all of the neighbors
+        let neighbors = n(state, 1)
+        if(neighbors.length == 0) {
+            return utility(state)
+        }
+        let minIndex = argMax(arrMap(neighbors, minvalue))
+        console.log(minvalue(neighbors[minIndex]))
+        return neighbors[minIndex]
     }
 
 }
@@ -171,7 +170,8 @@ const n = (state, p) => {
     return nei
 }
 
-var state = [[2,2,2], [2,2,2], [2,2,2]]
+
+var initialState = [[2,2,2], [2,2,2], [2,2,2]]
 class Game extends React.Component {
     constructor() {
         super()
@@ -185,7 +185,7 @@ class Game extends React.Component {
     }
 
     restartHandler() {
-        state = [[2,2,2], [2,2,2], [2,2,2]] 
+        initialState = [[2,2,2], [2,2,2], [2,2,2]] 
         this.forceUpdate()
     }
 
@@ -196,11 +196,19 @@ class Game extends React.Component {
     action (one, two) {
         //human turn
         //computer turn
-        state[one][two] = 1
+        initialState[one][two] = 1
+        var optimalAction = minimax(initialState, 0)
+        initialState = optimalAction
 
-
-        var optimalAction = minimax(state, 0)
-        state = optimalAction
+        if(utility(initialState) == 0) {
+            console.log('Nobody won')
+        }
+        else if(utility(initialState) == 1) {
+            console.log('X won')
+        }
+        else if(utility(initialState) == -1) {
+            console.log('O won')
+        }
 
         this.forceUpdate();
     }
@@ -210,39 +218,39 @@ class Game extends React.Component {
             <div>
                 <div class='grid-container'>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[0][0])}</p>
+                        <p class='text'>{pprint(initialState[0][0])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(0, 0)}}></button>
                     </div>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[0][1])}</p>
+                        <p class='text'>{pprint(initialState[0][1])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(0, 1)}}></button>
                     </div>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[0][2])}</p>
+                        <p class='text'>{pprint(initialState[0][2])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(0, 2)}}></button>
                     </div>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[1][0])}</p>
+                        <p class='text'>{pprint(initialState[1][0])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(1, 0)}}></button>
                     </div>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[1][1])}</p>
+                        <p class='text'>{pprint(initialState[1][1])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(1, 1)}}></button>
                     </div>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[1][2])}</p>
+                        <p class='text'>{pprint(initialState[1][2])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(1, 2)}}></button>
                     </div>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[2][0])}</p>
+                        <p class='text'>{pprint(initialState[2][0])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(2, 0)}}></button>
                     </div>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[2][1])}</p>
+                        <p class='text'>{pprint(initialState[2][1])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(2, 1)}}></button>
                     </div>
                     <div class='grid-item'>
-                        <p class='text'>{pprint(state[2][2])}</p>
+                        <p class='text'>{pprint(initialState[2][2])}</p>
                         <button class='button' style={{fontSize:`10px`}} onClick={() => {this.action(2, 2)}}></button>
                     </div>
                 </div>
@@ -250,9 +258,7 @@ class Game extends React.Component {
                     <button>RESTART</button>
                 </div>
             </div>
-
         )
-
     }
 }
 
